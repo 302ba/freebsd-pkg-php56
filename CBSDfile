@@ -1,0 +1,49 @@
+quiet=0
+
+jail_vm()
+{
+	ipv4_addr="DHCP"
+	#ip4_addr=$( dhcpd ip4pool=10.100.0.10-200 )
+	allow_sysvipc=1
+	allow_raw_sockets=1
+	host_hostname="${jname}.my.domain"
+	ver="native"
+	pkg_bootstrap="1"
+	nice="0"
+	pkglist="security/ca_root_nss devel/git"
+}
+
+postcreate_vm()
+{
+	local _ip
+	local _p
+	local pkglist
+	
+	# turn off unnecessary services
+	sysrc \
+		syslogd_flags="-ss -c" \
+		sendmail_enable="NO" \
+		sendmail_submit_enable="NO" \
+		sendmail_outbound_enable="NO" \
+		sendmail_msp_queue_enable="NO" \
+		php_fpm_enable="YES"
+
+	jscp files/distfiles ${jname}:/usr/ports
+	jscp files/pkg_php56 ${jname}:/root
+	jscp files/php-fpm.conf ${jname}:/usr/local/etc/
+	jscp files/php-fpm.d/www.conf ${jname}:/usr/local/etc/php-fpm.d/
+	jscp files/php.ini ${jname}:/usr/local/etc/
+	
+	# execute cmd inside jail
+	jexec <<EOF
+	export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin
+	set -o errexit
+
+	mkdir /var/log/php
+	touch /var/log/php/php.err
+	chown -R www:www /var/log/php
+	/bin/sh /root/pkg_php56/php56_install.sh
+EOF
+
+	service mode=action php-fpm start || false
+}
