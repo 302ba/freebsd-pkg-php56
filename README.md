@@ -1,6 +1,6 @@
-# freebsd-pkg-php56
+# FreeBSD PHP 5.6.40 packages
 
- (EoL) PHP 5.6 packages for installation on FreeBSD 12/13 into jail via [CBSD](https://github.com/cbsd/cbsd)
+ (EoL) PHP 5.6.40 packages for installation on FreeBSD 12/13 into jail via [CBSD](https://github.com/cbsd/cbsd)
 
 # List of installed packages:
 
@@ -34,3 +34,5 @@
 - php56-xmlreader-5.6.40.pkg
 - php56-xmlwriter-5.6.40.pkg
 - php56-zlib-5.6.40.pkg
+# Installing
+  Simply run command: cbsd up
